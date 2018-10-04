@@ -1,3 +1,4 @@
+#!/Users/atulsharma/anaconda3/bin/python
 import numpy as np
 from data import Data
 import ID3
