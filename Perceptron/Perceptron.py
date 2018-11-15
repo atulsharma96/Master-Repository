@@ -8,7 +8,7 @@ class TrainingSetNotInitializedException(Exception):
 
 
 class Perceptron:
-    def __init__(self):
+    def __init__(self, num_of_features=19):
         self.num_updates = 0.0
         self.x = []
         self.labels = []
@@ -17,12 +17,13 @@ class Perceptron:
         # fill vector with non-zero values
         while rand_val == 0.0:
             rand_val = random.randrange(-10, 10)
-        self.w = np.full((19, 1), rand_val / 1000.0)
+        self.w = np.full((num_of_features, 1), rand_val / 1000.0)
 
-        self.a = np.zeros((19, 1))
+        self.a = np.zeros((num_of_features, 1))
         self.b = rand_val/1000.0
         self.b_a = 0.0
         self.mode = None
+        self.num_of_features = num_of_features
 
     def read_file(self, path, append=False):
         """
@@ -36,7 +37,7 @@ class Perceptron:
         for line in data_file:
             line_vals = line.split(' ')
             labels.append(int(line_vals[0]))
-            features = np.zeros((19, 1))
+            features = np.zeros((self.num_of_features, 1))
             for i in range(0, len(line_vals)):
                 if i == 0:
                     continue
@@ -85,8 +86,8 @@ class Perceptron:
                         self.w = self.w + r * (self.labels[count] * example)
                         self.b = self.b + r * self.labels[count]#self.labels[count - 1]
                     count += 1
-                    r = r/float((T+1))
-                return self.w
+                    r = r_0/float((T+1))
+                # return self.w
             elif mode == 'margin':
                 for example in self.x:
                     prod = np.dot(np.transpose(self.w), example) + self.b
@@ -96,8 +97,8 @@ class Perceptron:
                         self.w = self.w + r * (self.labels[count] * example)
                         self.b = self.b + r * self.labels[count]#self.labels[count - 1]
                     count += 1
-                    r = r / float((T+1))
-                return self.w
+                    r = r_0 / float((T+1))
+                # return self.w
             elif mode == 'average':
                 for example in self.x:
                     prod = np.dot(np.transpose(self.w), example) + self.b
@@ -109,7 +110,7 @@ class Perceptron:
                     count += 1
                     self.a = self.a+self.w
                     self.b_a += self.b
-                return self.a
+                # return self.a
             else:
                 for example in self.x:
                     prod = np.dot(np.transpose(self.w), example) + self.b
@@ -119,7 +120,10 @@ class Perceptron:
                         self.w = self.w + r * (self.labels[count] * example)
                         self.b = self.b + r * self.labels[count]#self.labels[count - 1]
                     count += 1
-                return self.w
+                # return self.w
+        if mode == 'average':
+            return self.a
+        return self.w
 
     def predict(self, data):
         """
