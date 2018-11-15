@@ -10,8 +10,8 @@ class TrainingSetNotInitializedException(Exception):
 class Perceptron:
     def __init__(self):
         self.num_updates = 0.0
-        self.x = None
-        self.labels = np.zeros((0, 0))
+        self.x = []
+        self.labels = []
 
         rand_val = 0.0
         # fill vector with non-zero values
@@ -24,7 +24,7 @@ class Perceptron:
         self.b_a = 0.0
         self.mode = None
 
-    def read_file(self, path):
+    def read_file(self, path, append=False):
         """
         Reads in specified file into the model and uses it as training data when the train function is run.
         :param path: The path to the file to read in as training data.
@@ -32,10 +32,10 @@ class Perceptron:
         """
         data_file = open(path)
         example_list = list()
-        self.labels = list()
+        labels = list()
         for line in data_file:
             line_vals = line.split(' ')
-            self.labels.append(int(line_vals[0]))
+            labels.append(int(line_vals[0]))
             features = np.zeros((19, 1))
             for i in range(0, len(line_vals)):
                 if i == 0:
@@ -43,8 +43,13 @@ class Perceptron:
                 index, value = line_vals[i].split(":")
                 features[int(index)-1] = float(value)
             example_list.append(features)
-        self.labels = np.array(self.labels)
-        self.x = np.array(example_list)
+
+        if append:
+            self.labels = np.array([l for l in self.labels] + labels)
+            self.x = np.array([x for x in self.x] + example_list)
+        else:
+            self.labels = np.array(labels)
+            self.x = np.array(example_list)
 
     def train(self, r_0=1.0, mode='std', mu=1.0, t=10):  # t is the maximum training epoch
         """
@@ -78,7 +83,7 @@ class Perceptron:
                     if prod <= 0:
                         self.num_updates += 1.0
                         self.w = self.w + r * (self.labels[count] * example)
-                        self.b = self.b + r * self.labels[count - 1]
+                        self.b = self.b + r * self.labels[count]#self.labels[count - 1]
                     count += 1
                     r = r/float((T+1))
                 return self.w
@@ -89,7 +94,7 @@ class Perceptron:
                     if prod <= 0 or prod <= mu:
                         self.num_updates += 1.0
                         self.w = self.w + r * (self.labels[count] * example)
-                        self.b = self.b + r * self.labels[count - 1]
+                        self.b = self.b + r * self.labels[count]#self.labels[count - 1]
                     count += 1
                     r = r / float((T+1))
                 return self.w
@@ -100,7 +105,7 @@ class Perceptron:
                     if prod <= 0:
                         self.num_updates += 1.0
                         self.w = self.w + r*(self.labels[count]*example)
-                        self.b = self.b + r * self.labels[count - 1]
+                        self.b = self.b + r * self.labels[count]#self.labels[count - 1]
                     count += 1
                     self.a = self.a+self.w
                     self.b_a += self.b
@@ -112,7 +117,7 @@ class Perceptron:
                     if prod <= 0:
                         self.num_updates += 1.0
                         self.w = self.w + r * (self.labels[count] * example)
-                        self.b = self.b + r * self.labels[count - 1]
+                        self.b = self.b + r * self.labels[count]#self.labels[count - 1]
                     count += 1
                 return self.w
 
